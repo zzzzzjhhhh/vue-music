@@ -5,7 +5,15 @@
 </template>
 
 <script>
-export default {};
+import { mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapGetters({ singer: "getSinger" })
+  },
+  created() {
+    console.log(this.singer);
+  }
+};
 </script>
 
 <style lang="stylus" scoped rel="stylesheet/stylus">
