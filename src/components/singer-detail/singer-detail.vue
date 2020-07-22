@@ -8,8 +8,14 @@
 import { mapGetters } from "vuex";
 import { getSingerDetail } from "api/singer";
 import { ERR_OK } from "api/config";
+import { processSongsUrl, isValidMusic, createSong } from "common/js/song";
 
 export default {
+  data() {
+    return {
+      songs: []
+    };
+  },
   computed: {
     ...mapGetters({ singer: "getSinger" })
   },
@@ -24,9 +30,22 @@ export default {
       }
       getSingerDetail(this.singer.id).then(res => {
         if (res.code === ERR_OK) {
-          console.log(res.data.list);
+          processSongsUrl(this._normalizeSongs(res.data.list)).then(songs => {
+            this.songs = songs;
+            console.log(this.songs);
+          });
         }
       });
+    },
+    _normalizeSongs(list) {
+      let ret = [];
+      list.forEach(item => {
+        let { musicData } = item;
+        if (isValidMusic(musicData)) {
+          ret.push(createSong(musicData));
+        }
+      });
+      return ret;
     }
   }
 };
