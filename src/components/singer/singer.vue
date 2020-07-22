@@ -1,6 +1,7 @@
 <template>
   <div class="singer">
-    <list-view :data="this.singerList"></list-view>
+    <list-view @select="selectSinger" :data="this.singerList"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -24,6 +25,11 @@ export default {
     this._getSingerList();
   },
   methods: {
+    selectSinger(singer) {
+      this.$router.push({
+        path: `/singer/${singer.id}`
+      });
+    },
     _getSingerList() {
       getSingerList().then(res => {
         if (res.code === ERR_OK) {
@@ -72,9 +78,10 @@ export default {
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-.singer
-  position: fixed
-  top: 88px
-  bottom: 0
-  width: 100%
+.singer {
+  position: fixed;
+  top: 88px;
+  bottom: 0;
+  width: 100%;
+}
 </style>
