@@ -5,7 +5,7 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div class="filter"></div>
+      <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
     <scroll
@@ -73,7 +73,26 @@ export default {
     scrollY(newY) {
       let translateY = Math.max(this.minTranslateY, newY);
       let zIndex = 0;
+      let scale = 1;
+      let blur = 0;
+      // 列表向上滚动时layer一起向上滚动，实现遮挡背景图片效果
       this.$refs.layer.style["transform"] = `translate3d(0,${translateY}px,0)`;
+      this.$refs.layer.style[
+        "webkitTransform"
+      ] = `translate3d(0,${translateY}px,0)`;
+
+      const percent = Math.abs(newY / this.imageHeight);
+      if (newY > 0) {
+        // 向下滚动图片按比例放大
+        scale = percent + 1;
+        zIndex = 10;
+      } else {
+        // 向上滚动图片按比例模糊
+        blur = Math.min(20 * percent, 20);
+      }
+      this.$refs.filter.style["backdrop-filter"] = `blur(${blur}px)`;
+      this.$refs.filter.style["webkitBackdrop-filter"] = `blur(${blur}px)`;
+
       if (newY < this.minTranslateY) {
         this.$refs.bgImage.style.paddingTop = 0;
         this.$refs.bgImage.style.height = RESERVED_HEIGHT + "px";
@@ -81,9 +100,10 @@ export default {
       } else {
         this.$refs.bgImage.style.paddingTop = "70%";
         this.$refs.bgImage.style.height = 0;
-        zIndex = 0;
       }
       this.$refs.bgImage.style.zIndex = zIndex;
+      this.$refs.bgImage.style["transform"] = `scale(${scale})`;
+      this.$refs.bgImage.style["webkitTransform"] = `scale(${scale})`;
     }
   },
   components: {
